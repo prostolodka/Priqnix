@@ -30,7 +30,7 @@ fun CategoryListScreen(
     favoritesViewModel: FavoritesViewModel? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var searchQuery by remember { mutableStateOf("") }
+    val searchQuery = viewModel.searchQuery
 
     LaunchedEffect(category) {
         viewModel.loadItems(category)
@@ -65,7 +65,7 @@ fun CategoryListScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { query ->
-                    searchQuery = query
+                    viewModel.searchQuery = query
                     viewModel.loadItems(category, query)
                 },
                 label = { Text("Поиск") },

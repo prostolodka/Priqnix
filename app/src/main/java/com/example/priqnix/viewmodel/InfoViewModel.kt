@@ -1,5 +1,6 @@
 package com.example.priqnix.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.priqnix.data.InfoItem
@@ -18,10 +19,17 @@ sealed class InfoUiState {
 }
 
 @HiltViewModel
-class InfoViewModel @Inject constructor(private val repository: InfoRepository) : ViewModel() {
+class InfoViewModel @Inject constructor(
+    private val repository: InfoRepository,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<InfoUiState>(InfoUiState.Loading)
     val uiState: StateFlow<InfoUiState> = _uiState.asStateFlow()
+
+    var searchQuery: String
+        get() = savedStateHandle["searchQuery"] ?: ""
+        set(value) { savedStateHandle["searchQuery"] = value }
 
     private var currentCategory = ""
     private var currentQuery = ""

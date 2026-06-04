@@ -4,13 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,14 +39,17 @@ class MainActivity : ComponentActivity() {
 
     @Inject lateinit var databaseInitializer: DatabaseInitializer
 
+    private val _isDbReady = mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        splashScreen.setKeepOnScreenCondition { false }
+        splashScreen.setKeepOnScreenCondition { !_isDbReady.value }
 
         lifecycleScope.launch {
             databaseInitializer.initialize()
+            _isDbReady.value = true
         }
 
         val themeManager = ThemeManager(applicationContext)
@@ -50,10 +57,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             val isDarkTheme by themeManager.isDarkTheme.collectAsStateWithLifecycle()
             PriqnixTheme(darkTheme = isDarkTheme) {
-                val infoViewModel: InfoViewModel = hiltViewModel()
-                val employeeViewModel: EmployeesViewModel = hiltViewModel()
-                val favoritesViewModel: FavoritesViewModel = hiltViewModel()
-                AppNavigation(infoViewModel, employeeViewModel, favoritesViewModel, onThemeToggle = { themeManager.toggleTheme() })
+                if (_isDbReady.value) {
+                    val infoViewModel: InfoViewModel = hiltViewModel()
+                    val employeeViewModel: EmployeesViewModel = hiltViewModel()
+                    val favoritesViewModel: FavoritesViewModel = hiltViewModel()
+                    AppNavigation(infoViewModel, employeeViewModel, favoritesViewModel, onThemeToggle = { themeManager.toggleTheme() })
+                } else {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
         }
     }
@@ -102,7 +115,7 @@ fun AppNavigation(infoViewModel: InfoViewModel, employeeViewModel: EmployeesView
             exitTransition = { fadeOut() }
         ) {
             composable("home") { HomeScreen(navController = navController, onThemeToggle = onThemeToggle) }
-            composable("about") { AboutScreen(onThemeToggle = onThemeToggle) }
+            composable("about") { AboutScreen() }
             composable("products") { CategoryScreen(category = "Product", viewModel = infoViewModel, navController = navController, favoritesViewModel = favoritesViewModel) }
             composable("services") { CategoryScreen(category = "Service", viewModel = infoViewModel, navController = navController, favoritesViewModel = favoritesViewModel) }
             composable("education") { CategoryScreen(category = "Education", viewModel = infoViewModel, navController = navController, favoritesViewModel = favoritesViewModel) }

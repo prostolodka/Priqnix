@@ -17,6 +17,7 @@ fun AddItemDialog(
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var details by remember { mutableStateOf("") }
+    var showErrors by remember { mutableStateOf(false) }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -33,16 +34,18 @@ fun AddItemDialog(
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Название") },
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = { title = it; showErrors = false },
+                    label = { Text("Название *") },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = showErrors && title.isBlank()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = description,
-                    onValueChange = { description = it },
-                    label = { Text("Краткое описание") },
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = { description = it; showErrors = false },
+                    label = { Text("Краткое описание *") },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = showErrors && description.isBlank()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -66,9 +69,10 @@ fun AddItemDialog(
                             if (title.isNotBlank() && description.isNotBlank()) {
                                 onConfirm(title, description, details)
                                 onDismiss()
+                            } else {
+                                showErrors = true
                             }
-                        },
-                        enabled = title.isNotBlank()
+                        }
                     ) {
                         Text("Сохранить")
                     }

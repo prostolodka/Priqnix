@@ -60,7 +60,8 @@ fun TopMenuBar(navController: NavController? = null) {
         "employees" to "Сотрудники",
         "favorites" to "Избранное",
         "faq" to "FAQ",
-        "contacts" to "Контакты"
+        "contacts" to "Контакты",
+        "about" to "О компании"
     )
 
     Row(
@@ -242,8 +243,8 @@ fun PartnersSection() {
             items(partners) { partner ->
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFF2A2A35),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF3A3A45))
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
                 ) {
                     Text(
                         text = partner,
@@ -271,7 +272,7 @@ fun AnalyticsDevelopmentSection() {
             listOf("3D", "1С").forEach { label ->
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = Color(0xFF2A2A35),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
                     modifier = Modifier.size(80.dp, 80.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
