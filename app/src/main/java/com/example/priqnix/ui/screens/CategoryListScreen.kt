@@ -32,11 +32,22 @@ fun CategoryListScreen(
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery = viewModel.searchQuery
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarMessage by favoritesViewModel?.snackbarMessage?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(null) }
+
+    LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            favoritesViewModel?.clearSnackbar()
+        }
+    }
+
     LaunchedEffect(category) {
         viewModel.loadItems(category)
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(when(category) {

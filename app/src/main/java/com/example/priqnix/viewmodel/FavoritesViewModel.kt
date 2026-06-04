@@ -38,10 +38,18 @@ class FavoritesViewModel @Inject constructor(
 
     fun isFavorite(infoItemId: Int) = favoriteRepository.isFavorite(infoItemId)
 
+    private val _snackbarMessage = MutableStateFlow<String?>(null)
+    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
+
     fun toggleFavorite(item: FavoriteItem) {
         viewModelScope.launch {
             val isFav = favoriteRepository.isFavorite(item.infoItemId).first()
             favoriteRepository.toggleFavorite(item, isFav)
+            _snackbarMessage.value = if (isFav) "Удалено из избранного" else "Добавлено в избранное"
         }
+    }
+
+    fun clearSnackbar() {
+        _snackbarMessage.value = null
     }
 }

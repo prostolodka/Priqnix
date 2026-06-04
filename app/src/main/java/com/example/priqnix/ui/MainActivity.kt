@@ -82,9 +82,12 @@ fun AppNavigation(infoViewModel: InfoViewModel, employeeViewModel: EmployeesView
         BottomNavItem("education", "Образование", Icons.Default.School),
         BottomNavItem("employees", "Сотрудники", Icons.Default.People),
         BottomNavItem("favorites", "Избранное", Icons.Default.Favorite),
+        BottomNavItem("about", "О компании", Icons.Default.Info),
         BottomNavItem("faq", "FAQ", Icons.Default.QuestionAnswer),
         BottomNavItem("contacts", "Контакты", Icons.Default.Contacts)
     )
+
+    val favoriteCount by favoritesViewModel.favoriteItems.collectAsStateWithLifecycle()
 
     Scaffold(
         bottomBar = {
@@ -93,7 +96,19 @@ fun AppNavigation(infoViewModel: InfoViewModel, employeeViewModel: EmployeesView
                 val currentRoute = navBackStackEntry?.destination?.route
                 items.forEach { item ->
                     NavigationBarItem(
-                        icon = { Icon(item.icon, contentDescription = item.title) },
+                        icon = {
+                            if (item.route == "favorites") {
+                                BadgedBox(badge = {
+                                    if (favoriteCount.isNotEmpty()) {
+                                        Badge { Text(favoriteCount.size.toString()) }
+                                    }
+                                }) {
+                                    Icon(item.icon, contentDescription = item.title)
+                                }
+                            } else {
+                                Icon(item.icon, contentDescription = item.title)
+                            }
+                        },
                         label = { Text(item.title) },
                         selected = currentRoute == item.route,
                         onClick = {

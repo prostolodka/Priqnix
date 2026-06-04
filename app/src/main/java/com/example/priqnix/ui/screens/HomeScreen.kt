@@ -11,9 +11,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,26 +25,46 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(navController: NavController? = null, onThemeToggle: () -> Unit = {}) {
     val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(scrollState)
-    ) {
-        TopMenuBar(navController = navController)
-        BannerSection(onThemeToggle = onThemeToggle)
-        CategoryPills()
-        MissionSection()
-        StatsSection()
-        PartnersSection()
-        AnalyticsDevelopmentSection()
-        DirectionsSection()
-        Spacer(modifier = Modifier.height(32.dp))
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(scrollState)
+        ) {
+            TopMenuBar(navController = navController)
+            BannerSection(onThemeToggle = onThemeToggle)
+            CategoryPills()
+            MissionSection()
+            StatsSection()
+            PartnersSection()
+            AnalyticsDevelopmentSection()
+            DirectionsSection()
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+
+        if (scrollState.value > 200) {
+            SmallFloatingActionButton(
+                onClick = { coroutineScope.launch { scrollState.animateScrollTo(0) } },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = "Наверх"
+                )
+            }
+        }
     }
 }
 
@@ -243,8 +265,8 @@ fun PartnersSection() {
             items(partners) { partner ->
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    tonalElevation = 2.dp
                 ) {
                     Text(
                         text = partner,
@@ -272,7 +294,8 @@ fun AnalyticsDevelopmentSection() {
             listOf("3D", "1С").forEach { label ->
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                    tonalElevation = 2.dp,
                     modifier = Modifier.size(80.dp, 80.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
