@@ -1,14 +1,19 @@
 package com.example.priqnix.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,9 +21,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController? = null, onThemeToggle: () -> Unit = {}) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -27,8 +34,8 @@ fun HomeScreen() {
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(scrollState)
     ) {
-        TopMenuBar()
-        BannerSection()
+        TopMenuBar(navController = navController)
+        BannerSection(onThemeToggle = onThemeToggle)
         CategoryPills()
         MissionSection()
         StatsSection()
@@ -40,51 +47,86 @@ fun HomeScreen() {
 }
 
 @Composable
-fun TopMenuBar() {
+fun TopMenuBar(navController: NavController? = null) {
+    val currentRoute = navController?.let {
+        it.currentBackStackEntryAsState().value?.destination?.route
+    }
+
+    val topItems = listOf(
+        "home" to "Главная",
+        "products" to "Продукты",
+        "services" to "Услуги",
+        "education" to "Образование",
+        "employees" to "Сотрудники",
+        "favorites" to "Избранное",
+        "faq" to "FAQ",
+        "contacts" to "Контакты"
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF1A1A24))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .horizontalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        val items = listOf(
-            "Главная", "О компании", "Наши продукты", "Услуги", "Образование", "Контакты", "Оставить заявку"
-        )
-        items.forEach { item ->
+        topItems.forEach { (route, title) ->
             Text(
-                text = item,
-                fontSize = 14.sp,
-                fontWeight = if (item == "Главная") FontWeight.Bold else FontWeight.Normal,
-                color = if (item == "Главная") MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.8f)
+                text = title,
+                fontSize = 13.sp,
+                fontWeight = if (route == currentRoute) FontWeight.Bold else FontWeight.Normal,
+                color = if (route == currentRoute)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clickable {
+                    navController?.navigate(route) {
+                        popUpTo("home") { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
     }
 }
 
 @Composable
-fun BannerSection() {
-    Column(
+fun BannerSection(onThemeToggle: () -> Unit = {}) {
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 32.dp, horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(vertical = 32.dp, horizontal = 24.dp)
     ) {
-        Text(
-            text = "IQNIX",
-            fontSize = 54.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            letterSpacing = 4.sp
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Разработка digital-решений для бизнеса и людей",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center,
-            color = Color.White
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "IQNIX",
+                fontSize = 54.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                letterSpacing = 4.sp
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Разработка digital-решений для бизнеса и людей",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+        IconButton(
+            onClick = onThemeToggle,
+            modifier = Modifier.align(Alignment.TopEnd)
+        ) {
+            Icon(
+                imageVector = Icons.Default.DarkMode,
+                contentDescription = "Сменить тему"
+            )
+        }
     }
 }
 
@@ -124,13 +166,13 @@ fun MissionSection() {
             text = "Мы работаем для вас",
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Помогаем компаниям и их клиентам понять друг друга",
             fontSize = 16.sp,
-            color = Color.White.copy(alpha = 0.7f)
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Column {
@@ -142,7 +184,7 @@ fun MissionSection() {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("+", color = MaterialTheme.colorScheme.primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(point, color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp)
+                    Text(point, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f), fontSize = 14.sp)
                 }
                 Spacer(modifier = Modifier.height(4.dp))
             }
@@ -155,27 +197,42 @@ fun StatsSection() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 24.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
+            .padding(horizontal = 16.dp, vertical = 24.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        StatItem("47", "завершенных проектов")
-        StatItem("30 дн", "средний срок сдачи")
-        StatItem(">3,5 лет", "работаем в IT сфере")
+        StatItem("47", "завершённых\nпроектов")
+        StatItem("30 дн", "средний\nсрок сдачи")
+        StatItem(">3,5 лет", "работаем\nв IT сфере")
     }
 }
 
 @Composable
-fun StatItem(value: String, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(value, fontSize = 36.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-        Text(label, fontSize = 13.sp, color = Color.White.copy(alpha = 0.7f), textAlign = TextAlign.Center)
+fun RowScope.StatItem(value: String, label: String) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.weight(1f)
+    ) {
+        Text(
+            text = value,
+            fontSize = 26.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = label,
+            fontSize = 11.sp,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center,
+            lineHeight = 14.sp
+        )
     }
 }
 
 @Composable
 fun PartnersSection() {
     Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
-        Text("Партнёры", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        Text("Партнёры", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
         Spacer(modifier = Modifier.height(12.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             val partners = listOf(
@@ -192,7 +249,7 @@ fun PartnersSection() {
                         text = partner,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -207,7 +264,7 @@ fun AnalyticsDevelopmentSection() {
             .fillMaxWidth()
             .padding(24.dp)
     ) {
-        Text("Аналитика", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        Text("Аналитика", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
         Text("Разработка", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         Spacer(modifier = Modifier.height(16.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -217,8 +274,8 @@ fun AnalyticsDevelopmentSection() {
                     color = Color(0xFF2A2A35),
                     modifier = Modifier.size(80.dp, 80.dp)
                 ) {
-                    androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                        Text(label, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(label, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }
@@ -229,18 +286,24 @@ fun AnalyticsDevelopmentSection() {
 @Composable
 fun DirectionsSection() {
     Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
-        Text("Направления работы", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        Text("Направления работы", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
         Spacer(modifier = Modifier.height(12.dp))
         Text(
             "Мы постоянно развиваемся и масштабируемся, благодаря чему можем открывать новые",
             fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.7f)
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
         )
         Spacer(modifier = Modifier.height(24.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             ChipDirection("Разработка ПО")
             ChipDirection("Консалтинг")
             ChipDirection("Образование")
+            ChipDirection("Аналитика")
+            ChipDirection("UI/UX дизайн")
+            ChipDirection("Кибербезопасность")
         }
     }
 }

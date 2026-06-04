@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.priqnix.data.InfoItem
 import com.example.priqnix.repository.InfoRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed class InfoUiState {
     object Loading : InfoUiState()
@@ -15,7 +17,8 @@ sealed class InfoUiState {
     data class Error(val message: String) : InfoUiState()
 }
 
-class InfoViewModel(private val repository: InfoRepository) : ViewModel() {
+@HiltViewModel
+class InfoViewModel @Inject constructor(private val repository: InfoRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow<InfoUiState>(InfoUiState.Loading)
     val uiState: StateFlow<InfoUiState> = _uiState.asStateFlow()
@@ -37,6 +40,10 @@ class InfoViewModel(private val repository: InfoRepository) : ViewModel() {
                 _uiState.value = InfoUiState.Success(list)
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
     }
 
     fun getItem(id: Int, onResult: (InfoItem?) -> Unit) {

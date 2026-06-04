@@ -34,7 +34,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun PriqnixTheme(
-    darkTheme: Boolean = true, // принудительно тёмная тема
+    darkTheme: Boolean,
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme

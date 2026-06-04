@@ -1,13 +1,19 @@
 package com.example.priqnix.data
 
+import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import android.content.Context
 
-@Database(entities = [InfoItem::class], version = 1, exportSchema = false)
+@Database(
+    entities = [InfoItem::class, Employee::class, FavoriteItem::class],
+    version = 3,
+    exportSchema = false
+)
 abstract class InfoDatabase : RoomDatabase() {
     abstract fun infoDao(): InfoDao
+    abstract fun employeeDao(): EmployeeDao
+    abstract fun favoriteDao(): FavoriteDao
 
     companion object {
         @Volatile
@@ -19,7 +25,8 @@ abstract class InfoDatabase : RoomDatabase() {
                     context.applicationContext,
                     InfoDatabase::class.java,
                     "info_database"
-                ).build()
+                ).fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

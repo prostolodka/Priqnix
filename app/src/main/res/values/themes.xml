@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.Priqnix" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.Priqnix.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/black</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.Priqnix</item>
+    </style>
 </resources>

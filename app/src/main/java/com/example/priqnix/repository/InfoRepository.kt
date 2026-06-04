@@ -3,17 +3,12 @@ package com.example.priqnix.repository
 import com.example.priqnix.data.InfoDao
 import com.example.priqnix.data.InfoItem
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
 class InfoRepository(private val infoDao: InfoDao) {
 
-    suspend fun getByCategory(category: String): Flow<List<InfoItem>> = flow {
-        emit(infoDao.getByCategory(category))
-    }
+    fun getByCategory(category: String): Flow<List<InfoItem>> = infoDao.getByCategory(category)
 
-    suspend fun searchInCategory(category: String, query: String): Flow<List<InfoItem>> = flow {
-        emit(infoDao.searchInCategory(category, "%$query%"))
-    }
+    fun searchInCategory(category: String, query: String): Flow<List<InfoItem>> = infoDao.searchInCategory(category, "%$query%")
 
     suspend fun getItemById(id: Int): InfoItem? = infoDao.getById(id)
 

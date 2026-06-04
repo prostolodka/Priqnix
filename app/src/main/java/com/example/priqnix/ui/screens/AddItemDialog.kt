@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun AddItemDialog(
-    category: String,
+    @Suppress("UNUSED_PARAMETER") category: String,
     onDismiss: () -> Unit,
     onConfirm: (title: String, description: String, details: String) -> Unit
 ) {
