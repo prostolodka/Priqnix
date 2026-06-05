@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.priqnix.data.InfoItem
 import com.example.priqnix.repository.InfoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,12 +34,12 @@ class InfoViewModel @Inject constructor(
 
     private var currentCategory = ""
     private var currentQuery = ""
+    private var loadJob: Job? = null
 
     fun loadItems(category: String, query: String = "") {
-        currentCategory = category
-        currentQuery = query
-        viewModelScope.launch {
-            _uiState.value = InfoUiState.Loading
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            if (query.isBlank()) _uiState.value = InfoUiState.Loading
             val items = if (query.isBlank()) {
                 repository.getByCategory(category)
             } else {

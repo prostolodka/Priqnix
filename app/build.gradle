@@ -17,18 +17,18 @@ android {
         versionName '1.0'
     }
 
-    signingConfigs {
-        release {
-            storeFile file('release.keystore')
-            storePassword 'priqnix123'
-            keyAlias 'priqnix'
-            keyPassword 'priqnix123'
-        }
-    }
+//    signingConfigs {
+//        release {
+//            storeFile file('release.keystore')
+//            storePassword 'priqnix123'
+//            keyAlias 'priqnix'
+//            keyPassword 'priqnix123'
+//        }
+//    }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

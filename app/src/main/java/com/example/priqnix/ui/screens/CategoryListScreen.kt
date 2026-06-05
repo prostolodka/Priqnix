@@ -30,7 +30,7 @@ fun CategoryListScreen(
     favoritesViewModel: FavoritesViewModel? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val searchQuery = viewModel.searchQuery
+    var searchQuery by remember { mutableStateOf(viewModel.searchQuery) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val snackbarMessage by favoritesViewModel?.snackbarMessage?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(null) }
@@ -76,6 +76,7 @@ fun CategoryListScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { query ->
+                    searchQuery = query
                     viewModel.searchQuery = query
                     viewModel.loadItems(category, query)
                 },
@@ -95,14 +96,13 @@ fun CategoryListScreen(
                             Text("Нет записей. Нажмите + для добавления.")
                         }
                     } else {
-                            LazyColumn {
+                            LazyColumn(modifier = Modifier.weight(1f)) {
                                 items(state.items) { item ->
                                     InfoCard(
                                         item = item,
                                         navController = navController,
                                         favoritesViewModel = favoritesViewModel
                                     )
-                                    Spacer(modifier = Modifier.height(8.dp))
                                 }
                             }
                     }

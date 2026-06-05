@@ -14,3 +14,10 @@
 .cxx
 local.properties
 app/release.keystore
+*.drawio
+*.docx
+Priqnix.zip
+DIPLOM_UPDATES.md
+LISTINGS.md
+SETUP_GUIDE.md
+ARCH_DIAGRAM.drawio
